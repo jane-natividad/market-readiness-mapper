@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>One Playbook, Many Markets — Market Readiness Mapper | Jane Natividad</title>
+<meta name="description" content="A multi-market launch readiness tool: see which function is the real bottleneck in each market, and sequence the next launches by opportunity and readiness instead of by who asks loudest.">
+<style>
+  * { box-sizing: border-box; }
+  :root {
+    --accent: #0071e3; --accent-soft: #e8f2ff; --accent-border: #cce2ff;
+    --ink: #1d1d1f; --ink-soft: #48484a; --muted: #6e6e73;
+    --hairline: #e5e5e7; --panel: #f5f5f7; --bg: #ffffff;
+    --good: #1a7f4e; --good-soft: #e7f6ee;
+    --warn: #9a6b00; --warn-soft: #fff6e0;
+    --bad: #b3261e; --bad-soft: #fdecea;
+  }
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", Arial, sans-serif; }
+  .wrap { max-width: 800px; margin: 0 auto; padding: 56px 24px 80px; }
+  .back-link { display: inline-block; font-size: 12px; color: var(--muted); text-decoration: none; margin-bottom: 22px; }
+  .back-link:hover { color: var(--accent); }
+  .eyebrow { font-size: 11.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); font-weight: 600; margin-bottom: 14px; }
+  h1 { font-size: 30px; font-weight: 700; letter-spacing: -0.02em; margin: 0 0 14px; line-height: 1.18; text-wrap: balance; }
+  h2 { font-size: 17px; font-weight: 650; margin: 0 0 8px; letter-spacing: -0.01em; }
+  .byline { font-size: 12.8px; color: var(--muted); margin: 0 0 28px; }
+  .byline a { color: var(--muted); }
+  p { font-size: 14.5px; line-height: 1.62; color: var(--ink-soft); margin: 0 0 16px; }
+  .lede { font-size: 15.5px; line-height: 1.6; color: var(--ink); background: var(--panel); border-radius: 14px; padding: 20px 24px; margin: 0 0 28px; }
+  .section-label { font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); font-weight: 600; margin: 36px 0 14px; }
+  .section-sub { font-size: 13px; color: var(--ink-soft); margin: -6px 0 14px; line-height: 1.55; }
+  .panel { background: var(--panel); border-radius: 14px; padding: 20px 22px; margin: 0 0 18px; }
+  .card { border: 1px solid var(--hairline); border-radius: 12px; padding: 14px 16px; background: #fff; }
+  .card.top { border-color: var(--accent-border); background: var(--accent-soft); }
+  .stack { display: flex; flex-direction: column; gap: 10px; }
+  .pipeline { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 8px; }
+  .pipe-step { flex: 1 1 auto; min-width: 130px; background: var(--panel); border: 1px solid var(--hairline); border-radius: 10px; padding: 10px 12px; font-size: 11.3px; color: var(--ink-soft); line-height: 1.4; }
+  .pipe-step b { display: block; font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--accent); margin-bottom: 3px; }
+  .pipeline-note { font-size: 11.5px; color: var(--muted); margin: 0 0 24px; }
+  .btn { font-size: 12px; font-weight: 600; color: var(--accent); background: #fff; border: 1px solid var(--accent-border); border-radius: 8px; padding: 7px 13px; cursor: pointer; font-family: inherit; }
+  .btn:hover { background: var(--accent-soft); }
+  .btn.primary { color: #fff; background: var(--accent); border-color: var(--accent); }
+  .btn.primary:hover { background: #005bbf; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip { font-size: 11.8px; color: var(--accent); background: #fff; border: 1px solid var(--accent-border); border-radius: 999px; padding: 6px 13px; cursor: pointer; font-family: inherit; text-align: left; }
+  .chip:hover { background: var(--accent-soft); }
+  .chip.on { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .tag { display: inline-block; font-size: 10.3px; font-weight: 700; letter-spacing: 0.04em; border-radius: 999px; padding: 3px 9px; white-space: nowrap; }
+  .tag.good { color: var(--good); background: var(--good-soft); }
+  .tag.warn { color: var(--warn); background: var(--warn-soft); }
+  .tag.bad { color: var(--bad); background: var(--bad-soft); }
+  .tag.info { color: var(--accent); background: var(--accent-soft); }
+  .tag.mute { color: var(--muted); background: var(--panel); }
+  .bar-track { height: 7px; background: var(--hairline); border-radius: 999px; overflow: hidden; }
+  .bar-fill { height: 100%; background: var(--accent); border-radius: 999px; transition: width 0.25s ease; }
+  input[type=text], input[type=password], select, textarea { font-family: inherit; font-size: 13px; padding: 9px 12px; border-radius: 8px; border: 1px solid var(--hairline); background: #fff; color: var(--ink); }
+  textarea { width: 100%; resize: vertical; line-height: 1.5; }
+  input:focus, select:focus, textarea:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .gov-grid { display: flex; flex-direction: column; gap: 10px; margin: 0 0 32px; }
+  .gov-item { display: flex; gap: 12px; border: 1px solid var(--hairline); border-radius: 12px; padding: 13px 16px; }
+  .gov-icon { flex: 0 0 auto; width: 26px; height: 26px; border-radius: 50%; background: var(--accent-soft); color: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 12.5px; font-weight: 700; }
+  .gov-text b { display: block; font-size: 12.8px; color: var(--ink); margin-bottom: 2px; }
+  .gov-text span { font-size: 12.2px; color: var(--ink-soft); line-height: 1.55; }
+  .not-list { font-size: 12.5px; color: var(--ink-soft); line-height: 1.7; margin: 0 0 32px; padding-left: 20px; }
+  .not-list li { margin-bottom: 6px; }
+  .why { font-size: 13.3px; font-style: italic; color: var(--ink); background: var(--panel); border-radius: 14px; padding: 18px 22px; margin: 0 0 32px; line-height: 1.58; }
+  .disclosure { font-size: 11.5px; line-height: 1.55; color: var(--muted); background: var(--panel); border-radius: 10px; padding: 12px 16px; margin: 0 0 32px; }
+  pre.out { white-space: pre-wrap; word-break: break-word; background: var(--panel); border-radius: 10px; padding: 14px 16px; font-size: 12px; line-height: 1.6; color: var(--ink-soft); font-family: ui-monospace, "SF Mono", Menlo, monospace; margin: 0; }
+  table.grid { width: 100%; border-collapse: collapse; font-size: 12.3px; }
+  table.grid th { text-align: left; font-size: 10.3px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 600; padding: 8px 8px; border-bottom: 1px solid var(--hairline); }
+  table.grid td { padding: 9px 8px; border-bottom: 1px solid var(--hairline); color: var(--ink-soft); vertical-align: top; }
+  .scroll-x { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  footer { border-top: 1px solid var(--hairline); padding-top: 20px; font-size: 12px; color: var(--muted); }
+  footer a { color: var(--accent); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+  @media (max-width: 480px) { .wrap { padding: 40px 16px 60px; } h1 { font-size: 24px; } }
+
+  .mkt-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; }
+  .mkt { text-align: left; border: 1px solid var(--hairline); border-radius: 10px; padding: 10px 12px; background: #fff; cursor: pointer; font-family: inherit; }
+  .mkt:hover { border-color: var(--accent-border); }
+  .mkt.on { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent) inset; }
+  .mkt .nm { font-size: 13px; font-weight: 600; color: var(--ink); }
+  .mkt .st { font-size: 11px; margin-top: 4px; display: flex; align-items: center; gap: 6px; color: var(--muted); }
+  .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; flex: 0 0 auto; }
+  .dot.live { background: var(--good); } .dot.gap { background: var(--warn); } .dot.watch { background: #8fb8ef; }
+  .legend { display: flex; gap: 16px; flex-wrap: wrap; font-size: 11.5px; color: var(--muted); margin: 10px 0 0; }
+  .legend span { display: flex; align-items: center; gap: 6px; }
+  .fn-row { display: grid; grid-template-columns: 150px 1fr 34px; gap: 10px; align-items: center; margin: 8px 0; font-size: 12.5px; color: var(--ink-soft); }
+  .fn-row input[type=range] { width: 100%; accent-color: var(--accent); }
+  .fn-row .v { font-weight: 700; color: var(--ink); text-align: right; font-variant-numeric: tabular-nums; }
+  .fn-row.neck .lbl { color: var(--bad); font-weight: 700; }
+  .detail-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap; margin-bottom: 6px; }
+  .detail-note { font-size: 12.8px; color: var(--ink-soft); line-height: 1.55; margin: 6px 0 4px; }
+  .neck-box { margin-top: 12px; padding: 12px 14px; border-radius: 10px; background: var(--warn-soft); font-size: 12.6px; color: var(--ink); line-height: 1.55; }
+  .w-row { display: grid; grid-template-columns: 1fr 40px; gap: 4px 12px; align-items: center; font-size: 12.5px; font-weight: 600; color: var(--ink); }
+  .w-row input { grid-column: 1 / -1; width: 100%; accent-color: var(--accent); }
+  .w-row .v { text-align: right; color: var(--accent); font-variant-numeric: tabular-nums; }
+  td.num { font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
+  @media (max-width: 520px) { .fn-row { grid-template-columns: 110px 1fr 28px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back-link" href="https://jane-natividad.github.io">&larr; Back to portfolio</a>
+  <div class="eyebrow">Global Strategy · Market Access · Working Prototype</div>
+  <h1>One playbook, many markets: find the real bottleneck in each one before sequencing the next launch</h1>
+  <p class="byline">Jane Natividad &nbsp;&middot;&nbsp; <a href="https://jane-natividad.github.io">jane-natividad.github.io</a> &nbsp;&middot;&nbsp; <a href="https://github.com/jane-natividad/market-readiness-mapper">View on GitHub</a></p>
+
+  <div class="lede">"Global" usually means one launch playbook copied market by market. In practice every launch runs through the same four functions &mdash; evidence, regulatory, market access, and commercial execution &mdash; and what changes is <em>which one</em> is the bottleneck. This tool scores a fictional patient program's readiness across 13 markets, names the binding constraint in each, and sequences the next launches by opportunity and readiness, with the weights out in the open.</div>
+
+  <div class="section-label">1 · The footprint</div>
+  <p class="section-sub">Click any market. Scores are illustrative 1&ndash;5 readiness ratings for a fictional digital patient program attached to an established therapy.</p>
+  <div class="mkt-grid" id="markets"></div>
+  <div class="legend"><span><i class="dot live"></i>Live</span><span><i class="dot gap"></i>Gap &mdash; therapy available, program not launched</span><span><i class="dot watch"></i>Watchlist &mdash; not entered</span></div>
+
+  <div class="section-label">2 · One market, four functions</div>
+  <div class="card" id="detail"></div>
+
+  <div class="section-label">3 · Sequence the next launches</div>
+  <p class="section-sub">Ranks every market that isn't live yet. Opportunity = epidemiology and unmet need; readiness = the weakest function, not the average, because launches stall at the bottleneck.</p>
+  <div class="panel"><div class="stack" id="wts"></div></div>
+  <div class="card scroll-x"><table class="grid" id="seq"></table></div>
+
+  <div class="section-label">4 · Live isn't the same as working</div>
+  <p class="section-sub">Among live markets, the ones where a weak function suggests the launch hasn't converted to adoption yet.</p>
+  <div class="stack" id="live-risk"></div>
+
+  <div class="section-label">What this method learned</div>
+  <div class="gov-grid">
+    <div class="gov-item"><div class="gov-icon">1</div><div class="gov-text"><b>Nine launches don't predict the tenth</b><span>Markets that share a regulatory framework inherit the template. Markets outside it, even mature ones, need their own route &mdash; that's often why the most "obvious" markets are the ones missing.</span></div></div>
+    <div class="gov-item"><div class="gov-icon">2</div><div class="gov-text"><b>Funded access isn't adoption</b><span>A reimbursement listing removes one barrier. Clinician workflow, awareness and integration decide whether anyone uses it.</span></div></div>
+    <div class="gov-item"><div class="gov-icon">3</div><div class="gov-text"><b>Rank by the weakest link</b><span>Averaging four functions hides the one that will stall the launch. Readiness here is the minimum, and the tool names it.</span></div></div>
+    <div class="gov-item"><div class="gov-icon">4</div><div class="gov-text"><b>Hypothesize, validate, execute</b><span>Outside-in scores are a hypothesis. The first job in a real role is confirming them against internal data before acting on them.</span></div></div>
+  </div>
+
+  <div class="disclosure">Prototype with illustrative data. The program is fictional, and every score, status and note is invented for demonstration. Country names are used only to make regulatory groupings concrete; nothing here describes any company's actual footprint or plans.</div>
+  <footer>Built by <a href="https://jane-natividad.github.io">Jane Natividad</a>. No frameworks, no build step &mdash; a single static page and plain JavaScript. Companion to <a href="https://evidence-to-claim-builder.vercel.app">Evidence to Claim</a>.</footer>
+</div>
+
+<script>
+(function () {
+  "use strict";
+  var FN = [
+    { k: "ev", label: "Evidence", fix: "Local evidence gap — generate or adapt data the local HTA body or clinicians will accept." },
+    { k: "reg", label: "Regulatory", fix: "Regulatory route — the regional template doesn't port over; scope the local pathway for the program itself, not just the therapy." },
+    { k: "acc", label: "Market access", fix: "Access is fragmented — no single reimbursement gate; plan payer-by-payer or region-by-region." },
+    { k: "com", label: "Commercial & digital", fix: "Execution — the program exists on paper but clinician onboarding, localization or awareness is the leak." }
+  ];
+  var M = [
+    { n: "United States", s: "live", fw: "Own framework", sc: { ev: 4, reg: 4, acc: 3, com: 4 }, opp: 4, note: "Largest provider network; payer mix makes access uneven." },
+    { n: "Germany", s: "live", fw: "Shared regional", sc: { ev: 4, reg: 5, acc: 2, com: 4 }, opp: 4, note: "Live, but the reimbursement case for the program is still open." },
+    { n: "France", s: "live", fw: "Shared regional", sc: { ev: 4, reg: 5, acc: 4, com: 3 }, opp: 3, note: "Localized and listed." },
+    { n: "Netherlands", s: "live", fw: "Shared regional", sc: { ev: 4, reg: 5, acc: 4, com: 4 }, opp: 2, note: "Small but well-run." },
+    { n: "Italy", s: "live", fw: "Shared regional", sc: { ev: 4, reg: 5, acc: 3, com: 2 }, opp: 3, note: "Live site; thin clinician network for the population size." },
+    { n: "Spain", s: "live", fw: "Shared regional", sc: { ev: 4, reg: 5, acc: 3, com: 3 }, opp: 3, note: "Regional access varies." },
+    { n: "Poland", s: "live", fw: "Shared regional", sc: { ev: 3, reg: 5, acc: 2, com: 3 }, opp: 3, note: "Recently launched." },
+    { n: "Brazil", s: "live", fw: "Own framework", sc: { ev: 3, reg: 4, acc: 2, com: 3 }, opp: 4, note: "Private-sector led." },
+    { n: "Gulf states", s: "live", fw: "Own framework", sc: { ev: 3, reg: 4, acc: 4, com: 3 }, opp: 3, note: "Regional site; rising incidence." },
+    { n: "United Kingdom", s: "gap", fw: "Own framework", sc: { ev: 4, reg: 3, acc: 4, com: 4 }, opp: 4, note: "Therapy prescribable for years; outside the shared regional framework since it left. Looks like a scope question: extend an approval built for a product to a program." },
+    { n: "Canada", s: "gap", fw: "Own framework", sc: { ev: 4, reg: 3, acc: 2, com: 3 }, opp: 4, note: "Therapy available for years; no single reimbursement gate — provinces and private insurers one by one." },
+    { n: "Japan", s: "watch", fw: "Own framework", sc: { ev: 2, reg: 2, acc: 3, com: 2 }, opp: 5, note: "Fast-rising incidence; local evidence expectations are high." },
+    { n: "South Korea", s: "watch", fw: "Own framework", sc: { ev: 2, reg: 3, acc: 3, com: 3 }, opp: 4, note: "Fast-rising incidence; strong digital infrastructure." }
+  ];
+  var STATUS = { live: "Live", gap: "Gap", watch: "Watchlist" };
+  var W = { opp: 40, ready: 60 };
+  var sel = 9;
+  var $ = function (id) { return document.getElementById(id); };
+
+  function neck(m) { var best = FN[0]; FN.forEach(function (f) { if (m.sc[f.k] < m.sc[best.k]) best = f; }); return best; }
+  function minScore(m) { return Math.min.apply(null, FN.map(function (f) { return m.sc[f.k]; })); }
+
+  function renderMarkets() {
+    $("markets").innerHTML = "";
+    M.forEach(function (m, i) {
+      var b = document.createElement("button"); b.type = "button"; b.className = "mkt" + (i === sel ? " on" : "");
+      b.innerHTML = '<div class="nm">' + m.n + '</div><div class="st"><i class="dot ' + m.s + '"></i>' + STATUS[m.s] + " · " + neck(m).label + "</div>";
+      b.addEventListener("click", function () { sel = i; renderAll(); });
+      $("markets").appendChild(b);
+    });
+  }
+
+  function renderDetail() {
+    var m = M[sel], nk = neck(m);
+    var html = '<div class="detail-head"><h2 style="margin:0">' + m.n + '</h2><span><span class="tag ' + (m.s === "live" ? "good" : m.s === "gap" ? "warn" : "info") + '">' + STATUS[m.s] + '</span> <span class="tag mute">' + m.fw + '</span></span></div><div class="detail-note">' + m.note + "</div>";
+    FN.forEach(function (f) {
+      html += '<div class="fn-row' + (f.k === nk.k ? " neck" : "") + '"><span class="lbl">' + f.label + (f.k === nk.k ? " ◂ bottleneck" : "") + '</span><input type="range" min="1" max="5" step="1" value="' + m.sc[f.k] + '" data-k="' + f.k + '" aria-label="' + f.label + ' readiness"><span class="v">' + m.sc[f.k] + "</span></div>";
+    });
+    html += '<div class="fn-row"><span class="lbl">Opportunity</span><input type="range" min="1" max="5" step="1" value="' + m.opp + '" data-k="opp" aria-label="Opportunity"><span class="v">' + m.opp + "</span></div>";
+    html += '<div class="neck-box"><b>Binding constraint: ' + nk.label + ".</b> " + nk.fix + "</div>";
+    $("detail").innerHTML = html;
+    $("detail").querySelectorAll("input").forEach(function (r) {
+      r.addEventListener("input", function () { var v = +r.value; if (r.dataset.k === "opp") m.opp = v; else m.sc[r.dataset.k] = v; renderAll(); });
+    });
+  }
+
+  function renderWeights() {
+    $("wts").innerHTML = "";
+    [["opp", "Weight on opportunity"], ["ready", "Weight on readiness (weakest function)"]].forEach(function (p) {
+      var d = document.createElement("div"); d.className = "w-row";
+      d.innerHTML = "<span>" + p[1] + '</span><span class="v">' + W[p[0]] + '%</span><input type="range" min="0" max="100" value="' + W[p[0]] + '">';
+      d.querySelector("input").addEventListener("input", function (e) { W[p[0]] = +e.target.value; W[p[0] === "opp" ? "ready" : "opp"] = 100 - W[p[0]]; renderWeights(); renderSeq(); });
+      $("wts").appendChild(d);
+    });
+  }
+
+  function renderSeq() {
+    var rows = M.filter(function (m) { return m.s !== "live"; }).map(function (m) {
+      return { m: m, score: (m.opp * W.opp + minScore(m) * W.ready) / 100 };
+    }).sort(function (a, b) { return b.score - a.score; });
+    $("seq").innerHTML = "<tr><th>#</th><th>Market</th><th>Status</th><th>Bottleneck</th><th style='text-align:right'>Opp.</th><th style='text-align:right'>Ready</th><th style='text-align:right'>Score</th></tr>"
+      + rows.map(function (r, i) {
+        return "<tr" + (i === 0 ? " style='background:var(--accent-soft)'" : "") + "><td>" + (i + 1) + "</td><td><b style='color:var(--ink)'>" + r.m.n + "</b></td><td>" + STATUS[r.m.s] + "</td><td>" + neck(r.m).label + "</td><td class='num'>" + r.m.opp + "</td><td class='num'>" + minScore(r.m) + "</td><td class='num'><b>" + r.score.toFixed(2) + "</b></td></tr>";
+      }).join("");
+  }
+
+  function renderLiveRisk() {
+    var risk = M.filter(function (m) { return m.s === "live" && minScore(m) <= 2; });
+    $("live-risk").innerHTML = risk.map(function (m) {
+      var nk = neck(m);
+      return '<div class="card"><b style="font-size:13.5px">' + m.n + '</b> <span class="tag warn">' + nk.label + " " + m.sc[nk.k] + "/5</span><div style='font-size:12.5px;color:var(--ink-soft);margin-top:6px;line-height:1.5'>" + m.note + " Validate first: is this market launched, or adopted?</div></div>";
+    }).join("") || '<div class="card" style="font-size:12.5px;color:var(--muted)">No live market has a function scored 2 or below.</div>';
+  }
+
+  function renderAll() { renderMarkets(); renderDetail(); renderSeq(); renderLiveRisk(); }
+  renderWeights(); renderAll();
+})();
+</script>
+</body>
+</html>
